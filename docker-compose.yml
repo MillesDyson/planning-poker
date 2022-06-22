@@ -1,0 +1,42 @@
+version: "3.3"
+services:
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - /var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: mysqld --sql_mode=""
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+
+  redis:
+    mem_limit: 1Gb
+    image: redis:7-alpine
+    command: redis-server --appendonly no
+    hostname: redis
+    ports:
+      - "6379:6379"
+    volumes_from:
+      - data_redis
+
+  data_redis:
+    image: cogniteev/echo
+    command: echo 'Data Container for Redis'
+    volumes:
+      - /data
+    ports:
+      - 9292:929
+
+  app:
+    build: .
+    tty: true
+    container_name: planning-poker
+    command: bash -c "rm -f tmp/pids/server.pid && bundle install && tail -F anything"
+    volumes:
+      - .:/planning-poker
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+      - redis
