@@ -13,6 +13,6 @@ Rails.start()
 Turbolinks.start()
 ActiveStorage.start()
 
-$(document).on('turbolinks:load', function () {
-  alert("We made it!");
-})
+var componentRequireContext = require.context("components", true);
+var ReactRailsUJS = require("react_ujs");
+ReactRailsUJS.useContext(componentRequireContext);
